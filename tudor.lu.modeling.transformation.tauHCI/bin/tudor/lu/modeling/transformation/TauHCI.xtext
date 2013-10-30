@@ -1,0 +1,106 @@
+
+/********************************************************************************
+ * Copyright (c) 2013 Public Research Center Henri Tudor. 
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0 
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors: 
+ *     CRP Henri Tudor - Initial implementation - Jean-Sebastien Sottet.
+ *     
+ ******************************************************************************/
+
+grammar tudor.lu.modeling.transformation.TauHCI with org.eclipse.xtext.common.Terminals
+
+generate tauHCI "http://www.lu.tudor/modeling/transformation/TauHCI"
+
+Model:
+	rules+=Rule*
+	specificRules+=Specific*
+	domainRules+=Domain*
+	;
+	
+Rule:
+	'task rule from' auitype=Type ('and' taskType=AUIType | 'and' interactivelyValid=Valid )? 'to' uielement=UIElement ';'
+	;
+	
+Specific :
+	'specific rule from' taskName=STRING ('interactivelyValid')? 'to' uielement+=UIElement* ';'
+;
+
+Domain :
+	'domain rule from' domainType=AttributeType 'to' uielement=UIElement ';'
+;
+
+Valid : 
+	'interactive' | 'notinteractive'
+;
+
+HasSubWindow :
+	'subWindows' | 'notsubWindows'
+;
+
+// This can be generated from TDA Metamodel enumeration of Type and AUI type from 
+Type :
+	'selection_1_n' | 'selection_n_n' | 'container' | 'input' | 'output' | 'command' | 'navigation' |'Root' 
+;
+
+AUIType :
+	'abstract' | 'interactive' | 'user' | 'system' 
+;
+
+
+// This can be generated from CUI metamodel
+UIElement :
+	Window | ListElementSelector | Button | Panel | DataField | ImageField | TextField | TextArea
+;
+
+
+AttributeType :
+	'string' | 'text' | 'document' | 'date'
+;
+
+Label :
+	STRING | 'taskName'
+;
+
+Window :
+	'Window' label+=Label?  'with' containedElements+=Concept
+;
+
+Panel :
+	'Panel' label+=Label? 'with' containedElements+=Concept
+;
+
+ListElementSelector :
+	'ListElementSelector' label=Label? ('with' containedElements+=Concept)?
+;
+
+Concept :
+	'All Concepts' | 'No Concepts' | selection+=SelectedConcept*
+;
+
+SelectedConcept :
+	'concept' 'name' id=STRING
+;
+
+Button :
+	'Button' (label+=Label)?	
+;
+
+DataField :
+	'DataField' (label+=Label)?
+;
+
+ImageField :
+	'ImageField' label=Label?
+;
+
+TextField :
+	'TextField' label=Label?
+;
+
+TextArea :
+	'TextArea' label=Label?
+;

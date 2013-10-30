@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ASCII"?>
+<tauHCI:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tauHCI="http://www.lu.tudor/modeling/transformation/TauHCI">
+  <rules auitype="Container" interactivelyValid="interative">
+    <uielement xsi:type="tauHCI:Window"/>
+  </rules>
+  <rules auitype="Container" interactivelyValid="notinteractive">
+    <uielement xsi:type="tauHCI:Panel"/>
+  </rules>
+  <rules auitype="Output" interactivelyValid="interative">
+    <uielement xsi:type="tauHCI:Panel"/>
+  </rules>
+  <rules auitype="Input" interactivelyValid="interative">
+  	 <uielement xsi:type="tauHCI:DataField"/>
+  </rules>
+  <rules auitype="Choice 1/n" interactivelyValid="interative">
+    <uielement xsi:type="tauHCI:ListElementSelector"/>
+  </rules>
+  <rules auitype="Choice n/n" interactivelyValid="interative">
+    <uielement xsi:type="tauHCI:ListElementSelector"/>
+  </rules>
+</tauHCI:Model>

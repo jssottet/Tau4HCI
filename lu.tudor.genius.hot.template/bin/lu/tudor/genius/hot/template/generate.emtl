@@ -1,0 +1,2333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:mtl="http://www.eclipse.org/acceleo/mtl/3.0" xmlns:ocl.ecore="http://www.eclipse.org/ocl/1.1.0/Ecore">
+  <mtl:Module name="generate" nsURI="lu::tudor::genius::hot::template::generate" startHeaderPosition="29" endHeaderPosition="143">
+    <input>
+      <takesTypesFrom href="http://www.lu.tudor/modeling/transformation/TauHCI#/"/>
+    </input>
+    <ownedModuleElement xsi:type="mtl:Template" name="generate" visibility="Public" main="true">
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;&#xA;"/>
+      <body xsi:type="mtl:FileBlock" openMode="OverWrite">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;-- @path CUI=/lu.tudor.genius.transformation/metamodel/CUI.ecore&#xA;&#x9;-- @nsURI TDA=http://tudor.lu/tda&#xA;&#x9;-- @lib LibID=/lu.tudor.genius.transformation/transformation/Library/TaskIdCreator.atl&#xA;&#x9;-- @lib LibTask4CUI=/lu.tudor.genius.transformation/transformation/Library/TaskCUILibrary.atl&#xA;&#x9;&#xA;&#x9;-- This transformation as been generated from Task/CUI specific Transformation model&#xA;&#x9;-- By Acceleo Template&#xA;&#x9;module TdaToDetailedCui;&#xA;&#x9;create OUT : CUI from IN : TDA;&#xA;&#xA;"/>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;helper def : CreateId : Map(TDA!Task, Integer) = &#xA;&#x9;TDA!Task.allInstancesFrom('IN')->iterate(e; mapid: Map(TDA!Task,Integer) = Map{} |&#xA;&#x9;&#x9;&#x9;mapid.including(e, mapid.getValues()->size()+1)&#xA;&#x9;&#x9;);&#xA;&#xA;&#x9;helper context TDA!Task  def : getDirectSubTasks : Sequence(TDA!Task) = if(self.operator.oclIsUndefined()) then Sequence{} else self.operator.subTasks endif;&#xA;&#xA;&#x9;-- A task is interactively valid if it contains an interaction auitype, if it is clearly identified as interactive type and if it manipulates&#xA;&#x9;-- at least one interaction concept.&#xA;&#x9;--- @return true if the task is interactive and it is manipulated concepts.&#xA;&#x9;helper context TDA!Task def : isInteractivelyValid() : Boolean =  self.type=#&quot;interactive&quot;&#xA;&#x9;and not self.associations.oclIsUndefined()&#xA;&#x9;and self.associations.notEmpty()&#xA;&#x9;;&#xA;&#xA;&#x9;--- @return true if the current task is not a leaf task nor the root task.&#xA;&#x9;helper context TDA!Task def : isNotLeafNorRoot() : Boolean =   not self.operator.oclIsUndefined()&#xA;&#x9;&#x9;&#x9;              &#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;and not(self.superOperator.oclIsUndefined());&#xA;&#xA;&#xA;&#x9;helper context TDA!Task def: getID() : Integer = thisModule.CreateId.get(self);&#xA;&#xA;&#xA;&#x9;helper def : DomainAttributeToInteractor(input:TDA!LinkableConceptElement) : Sequence(CUI!GraphicalInteractor) = &#xA;&#x9;&#x9;if(input.oclIsKindOf(TDA!DomainAttribute)) then&#xA;&#x9;&#x9;&#x9;if(input.type=#&quot;document&quot;) then thisModule.DomainImageToImageField(input) else &#xA;&#x9;&#x9;&#x9;&#x9;if(input.type=#&quot;text&quot;) then thisModule.DomainTextToTextArea(input) else&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;if(input.type=#&quot;string&quot;) then thisModule.DomainStringToTextfield(input) else &#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;if(input.type=#&quot;date&quot;) then thisModule.DomainDateToDateField(input) else Sequence{}&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;endif&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;endif&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;endif&#xA;&#x9;&#x9;&#x9;&#x9;endif&#xA;&#x9;&#x9;else &#xA;&#x9;&#x9;&#x9;Sequence{}&#xA;&#x9;&#x9;endif;&#xA;&#x9;&#xA;"/>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;rule ModelToModel {&#xA;&#x9;&#x9;from&#xA;&#x9;&#x9;&#x9;modin : TDA!TDAModel&#xA;&#x9;&#x9;to &#xA;&#x9;&#x9;&#x9;modout : CUI!CuiModel(&#xA;&#x9;&#x9;&#x9;&#x9;cuiObjects &lt;- modin.mainTask&#xA;&#x9;&#x9;)&#xA;&#x9;}&#xA;&#x9;&#xA;"/>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;--- Create an &quot;interaction&quot; Space for Root of the Task tree; Space is used to describe an application or service interaction space&#xA;&#x9;rule MainTaskToSpace {&#xA;&#x9;&#x9;from&#xA;&#x9;&#x9;&#x9;maintsk : TDA!Task(maintsk.superOperator.oclIsUndefined())&#xA;&#x9;&#x9;to &#xA;&#x9;&#x9;&#x9;win : CUI!Space (&#xA;&#x9;&#x9;&#x9;&#x9;name &lt;- maintsk.name,&#xA;&#x9;&#x9;&#x9;&#x9;id &lt;-maintsk.getID(),&#xA;&#x9;&#x9;&#x9;&#x9;containedObjects &lt;- maintsk.getDirectSubTasks&#xA;&#x9;&#x9;&#x9;)&#xA;&#x9;}&#xA;&#x9;-- *************************END OF HANDWRITTEN CODE***********************************---&#xA;"/>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="-- ***********************************************&#xA;-- General transformation Rules&#xA;-- ***********************************************&#xA;"/>
+        <body xsi:type="mtl:ForBlock">
+          <body xsi:type="mtl:TemplateInvocation" definition="/0/gRule">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <argument xsi:type="ocl.ecore:VariableExp" name="it" referredVariable="/0/generate/@body.1/@body.5/it">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+            </argument>
+          </body>
+          <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;"/>
+          <loopVariable name="it">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+          </loopVariable>
+          <iterSet xsi:type="ocl.ecore:PropertyCallExp" eType="/8/OrderedSet(Rule)">
+            <source xsi:type="ocl.ecore:VariableExp" name="aModel" referredVariable="/0/generate/aModel">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+            </source>
+            <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model/rules"/>
+          </iterSet>
+        </body>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;-- ***********************************************&#xA;-- Specific transformation Rules&#xA;-- ***********************************************&#xA;"/>
+        <body xsi:type="mtl:ForBlock">
+          <body xsi:type="mtl:TemplateInvocation" definition="/0/specRule">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <argument xsi:type="ocl.ecore:VariableExp" name="it" referredVariable="/0/generate/@body.1/@body.7/it">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+            </argument>
+          </body>
+          <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;"/>
+          <loopVariable name="it">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+          </loopVariable>
+          <iterSet xsi:type="ocl.ecore:PropertyCallExp" eType="/8/OrderedSet(Specific)">
+            <source xsi:type="ocl.ecore:VariableExp" name="aModel" referredVariable="/0/generate/aModel">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+            </source>
+            <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model/specificRules"/>
+          </iterSet>
+        </body>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;-- ***********************************************&#xA;-- Domain Attribute transformation - Lazy Rules &#xA;-- ***********************************************&#xA;"/>
+        <body xsi:type="mtl:ForBlock">
+          <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;"/>
+          <body xsi:type="mtl:TemplateInvocation" definition="/0/domRule">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <argument xsi:type="ocl.ecore:VariableExp" name="it" referredVariable="/0/generate/@body.1/@body.9/it">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+            </argument>
+          </body>
+          <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;"/>
+          <loopVariable name="it">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+          </loopVariable>
+          <iterSet xsi:type="ocl.ecore:PropertyCallExp" eType="/8/OrderedSet(Domain)">
+            <source xsi:type="ocl.ecore:VariableExp" name="aModel" referredVariable="/0/generate/aModel">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+            </source>
+            <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model/domainRules"/>
+          </iterSet>
+        </body>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;"/>
+        <fileUrl xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <source xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="TaskToCUI">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          </source>
+          <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=".atl">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+        </fileUrl>
+        <charset xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="UTF-8">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </charset>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;"/>
+      <parameter name="aModel">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="gRule">
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" rule "/>
+      <body xsi:type="ocl.ecore:OperationCallExp">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <source xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <source xsi:type="ocl.ecore:PropertyCallExp">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+            </source>
+            <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/auitype"/>
+          </source>
+          <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="To">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+        </source>
+        <argument xsi:type="mtl:TemplateInvocation" definition="/0/nameString">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <argument xsi:type="ocl.ecore:PropertyCallExp">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+            <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+            </source>
+            <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/uielement"/>
+          </argument>
+        </argument>
+        <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" {&#xA;&#x9;&#x9;from&#xA;&#x9;&#x9;&#x9;&#xA;&#x9;&#x9;&#x9;in_tsk : TDA!Task("/>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;(maintsk.superOperator.oclIsUndefined()) "/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp" referredOperation="/1/String_Class/equalsIgnoreCase">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:PropertyCallExp">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+            </source>
+            <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/auitype"/>
+          </source>
+          <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="Root">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          </argument>
+        </ifExpr>
+        <else>
+          <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="  in_tsk.auiType=#&quot;"/>
+          <body xsi:type="ocl.ecore:PropertyCallExp">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+            </source>
+            <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/auitype"/>
+          </body>
+          <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&quot;&#xA;"/>
+          <body xsi:type="mtl:IfBlock">
+            <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="  and in_tsk.isInteractivelyValid()&#xA;"/>
+            <ifExpr xsi:type="ocl.ecore:OperationCallExp" referredOperation="/1/String_Class/equalsIgnoreCase">
+              <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+              <source xsi:type="ocl.ecore:PropertyCallExp">
+                <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+                <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+                  <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+                </source>
+                <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/interactivelyValid"/>
+              </source>
+              <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="interactive">
+                <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+              </argument>
+            </ifExpr>
+          </body>
+          <body xsi:type="mtl:IfBlock">
+            <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="  and in_tsk.type=#&quot;abstract&quot; "/>
+            <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="  and in_tsk.isNotLeafNorRoot() "/>
+            <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;"/>
+            <ifExpr xsi:type="ocl.ecore:OperationCallExp" referredOperation="/1/String_Class/equalsIgnoreCase">
+              <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+              <source xsi:type="ocl.ecore:PropertyCallExp">
+                <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+                <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+                  <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+                </source>
+                <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/interactivelyValid"/>
+              </source>
+              <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="notinteractive">
+                <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+              </argument>
+            </ifExpr>
+          </body>
+        </else>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;&#x9;&#x9;&#x9;&#x9;)&#xA;&#x9;&#x9;to&#xA;&#x9;&#x9;   "/>
+      <body xsi:type="mtl:TemplateInvocation" definition="/0/cOutPattern">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <argument xsi:type="ocl.ecore:PropertyCallExp">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="rule" referredVariable="/0/gRule/rule">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+          </source>
+          <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule/uielement"/>
+        </argument>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;&#x9;&#x9;&#x9;&#xA;"/>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;}"/>
+      <parameter name="rule">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="specRule">
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" rule Specific_TaskName"/>
+      <body xsi:type="ocl.ecore:OperationCallExp">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <source xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <source xsi:type="ocl.ecore:OperationCallExp" referredOperation="/1/String_Class/replaceAll">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <source xsi:type="ocl.ecore:PropertyCallExp">
+              <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+              <source xsi:type="ocl.ecore:VariableExp" name="srule" referredVariable="/0/specRule/srule">
+                <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+              </source>
+              <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific/taskName"/>
+            </source>
+            <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" ">
+              <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            </argument>
+            <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="">
+              <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            </argument>
+          </source>
+          <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="To">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+        </source>
+        <argument xsi:type="mtl:TemplateInvocation" definition="/0/nameString">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <argument xsi:type="ocl.ecore:OperationCallExp">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+            <source xsi:type="ocl.ecore:PropertyCallExp" eType="/8/OrderedSet(UIElement)">
+              <source xsi:type="ocl.ecore:VariableExp" name="srule" referredVariable="/0/specRule/srule">
+                <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+              </source>
+              <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific/uielement"/>
+            </source>
+            <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OrderedSet(T)_Class/first"/>
+          </argument>
+        </argument>
+        <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" {&#xA;&#x9;from&#xA;&#x9;&#x9;in_tsk : TDA!Task(in_tsk.name='"/>
+      <body xsi:type="ocl.ecore:PropertyCallExp">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <source xsi:type="ocl.ecore:VariableExp" name="srule" referredVariable="/0/specRule/srule">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+        </source>
+        <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific/taskName"/>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="')&#xA;&#x9;to&#xA;&#x9;&#x9;"/>
+      <body xsi:type="mtl:TemplateInvocation" definition="/0/cOutPattern">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <argument xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          <source xsi:type="ocl.ecore:PropertyCallExp" eType="/8/OrderedSet(UIElement)">
+            <source xsi:type="ocl.ecore:VariableExp" name="srule" referredVariable="/0/specRule/srule">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+            </source>
+            <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific/uielement"/>
+          </source>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OrderedSet(T)_Class/first"/>
+        </argument>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;"/>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;}"/>
+      <parameter name="srule">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="domRule">
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" lazy rule Domain"/>
+      <body xsi:type="ocl.ecore:OperationCallExp">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <source xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <source xsi:type="ocl.ecore:PropertyCallExp">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+            <source xsi:type="ocl.ecore:VariableExp" name="domain" referredVariable="/0/domRule/domain">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+            </source>
+            <referredProperty xsi:type="ecore:EAttribute" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain/domainType"/>
+          </source>
+          <argument xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="To">
+            <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+        </source>
+        <argument xsi:type="mtl:TemplateInvocation" definition="/0/nameString">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+          <argument xsi:type="ocl.ecore:PropertyCallExp">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+            <source xsi:type="ocl.ecore:VariableExp" name="domain" referredVariable="/0/domRule/domain">
+              <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+            </source>
+            <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain/uielement"/>
+          </argument>
+        </argument>
+        <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String_Class/concat"/>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" {&#xA;&#x9;from&#xA;&#x9;&#x9;in_dom : TDA!DomainAttribute&#xA;&#x9;to&#xA;&#x9;&#x9;"/>
+      <body xsi:type="mtl:TemplateInvocation" definition="/0/domOutPattern">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <argument xsi:type="ocl.ecore:PropertyCallExp">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="domain" referredVariable="/0/domRule/domain">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+          </source>
+          <referredProperty xsi:type="ecore:EReference" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain/uielement"/>
+        </argument>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA; }&#xA;"/>
+      <parameter name="domain">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="cOutPattern">
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;&#x9;out : CUI!"/>
+      <body xsi:type="mtl:TemplateInvocation" definition="/0/nameString">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <argument xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/cOutPattern/elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </argument>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" (&#xA;&#x9;&#x9;&#x9;&#x9;name &lt;- in_tsk.name,&#xA;&#x9;&#x9;&#x9;&#x9;id &lt;-in_tsk.getID()"/>
+      <body xsi:type="mtl:TemplateInvocation" definition="/0/cBindings">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <argument xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/cOutPattern/elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </argument>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#xA;)"/>
+      <parameter name="elem">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="domOutPattern">
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="&#x9;out : CUI!"/>
+      <body xsi:type="mtl:TemplateInvocation" definition="/0/nameString">
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <argument xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/domOutPattern/elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </argument>
+      </body>
+      <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=" (&#xA;&#x9;&#x9;&#x9;name &lt;- in_dom.name,&#xA;&#x9;&#x9;&#x9;labelPrefix &lt;- if(in_dom.istypePromoted) then in_dom.name else '' endif&#xA;&#x9;)"/>
+      <parameter name="elem">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="nameString">
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="Button &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/Button">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Button"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="Windows &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/Window">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Window"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="Panel &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/Panel">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Panel"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="ListElementSelector &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/ListElementSelector">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//ListElementSelector"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="Datafield &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/DataField">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//DataField"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="ImageField&#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/ImageField">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//ImageField"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="TextArea&#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/TextArea">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//TextArea"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="TextField&#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/nameString/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/TextField">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//TextField"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <parameter name="elem">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+      </parameter>
+    </ownedModuleElement>
+    <ownedModuleElement xsi:type="mtl:Template" name="cBindings">
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=",&#xA;containedObjects &lt;- in_tsk.getDirectSubTasks,&#xA;containedObjects &lt;- in_tsk.associations->collect(e | thisModule.DomainAttributeToInteractor(e.manipulatedConcepts)) &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/cBindings/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/Window">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Window"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=",&#xA;containedObjects &lt;- in_tsk.getDirectSubTasks,&#xA;"/>
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol="containedObjects &lt;- in_tsk.associations->collect(e | thisModule.DomainAttributeToInteractor(e.manipulatedConcepts)) &#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/cBindings/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/Panel">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Panel"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <body xsi:type="mtl:IfBlock">
+        <body xsi:type="ocl.ecore:StringLiteralExp" stringSymbol=",&#xA;containedElements &lt;- in_tsk.associations->collect(e | thisModule.DomainAttributeToInteractor(e.manipulatedConcepts))&#xA;"/>
+        <ifExpr xsi:type="ocl.ecore:OperationCallExp">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+          <source xsi:type="ocl.ecore:VariableExp" name="elem" referredVariable="/0/cBindings/elem">
+            <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+          </source>
+          <argument xsi:type="ocl.ecore:TypeExp" eType="/59/ListElementSelector">
+            <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//ListElementSelector"/>
+          </argument>
+          <referredOperation xsi:type="ecore:EOperation" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny_Class/oclIsTypeOf"/>
+        </ifExpr>
+      </body>
+      <parameter name="elem">
+        <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+      </parameter>
+    </ownedModuleElement>
+  </mtl:Module>
+  <ecore:EPackage name="additions">
+    <eClassifiers xsi:type="ecore:EClass" name="String_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eAnnotations>
+      <eOperations name="substitute">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="r">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="t">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="index">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        <eParameters name="r">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="first">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="n">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="last">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="n">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="strstr">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+        <eParameters name="r">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="strtok">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="s1">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="flag">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="strcmp">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        <eParameters name="s1">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="isAlpha">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+      </eOperations>
+      <eOperations name="isAlphanum">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+      </eOperations>
+      <eOperations name="toUpperFirst">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="toLowerFirst">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="replace">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="replacement">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="replaceAll">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="replacement">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="substituteAll">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="replacement">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="startsWith">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="endsWith">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="trim">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="tokenize">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(String)"/>
+        <eParameters name="delimiters">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="contains">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="matches">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+        <eParameters name="regex">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="lastIndex">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        <eParameters name="substring">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="equalsIgnoreCase">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Boolean"/>
+        <eParameters name="other">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="substring">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="startIndex">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="+">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="other">
+          <eType xsi:type="ocl.ecore:AnyType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny"/>
+        </eParameters>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Integer_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+      </eAnnotations>
+      <eOperations name="toString">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Real_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Real"/>
+      </eAnnotations>
+      <eOperations name="toString">
+        <eAnnotations source="MTL"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="EObject_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+      </eAnnotations>
+      <eOperations name="eAllContents">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+      </eOperations>
+      <eOperations name="eAllContents">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="ancestors">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+      </eOperations>
+      <eOperations name="ancestors">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="siblings">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+      </eOperations>
+      <eOperations name="siblings">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="eInverse">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:OrderedSetType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//OrderedSet(OclAny)"/>
+      </eOperations>
+      <eOperations name="eInverse">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:OrderedSetType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//OrderedSet(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="precedingSiblings">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+      </eOperations>
+      <eOperations name="precedingSiblings">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="followingSiblings">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+      </eOperations>
+      <eOperations name="followingSiblings">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="eContainer">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//OclAny"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="eContents">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="eGet">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+        <eParameters name="featureName">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="generate">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/generate"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="aModel">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="gRule">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/gRule"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="rule">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="specRule">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/specRule"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="srule">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="domRule">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/domRule"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="domain">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="cOutPattern">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/cOutPattern"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="domOutPattern">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/domOutPattern"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="nameString">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/nameString"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="cBindings">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/cBindings"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="elem">
+          <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+        </eParameters>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="OclAny_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny"/>
+      </eAnnotations>
+      <eOperations name="toString">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="invoke">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:AnyType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclAny"/>
+        <eParameters name="class">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="method">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="arguments">
+          <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="current">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//OclAny"/>
+        <eParameters name="index">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="current">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//OclAny"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="getProperty">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="key">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="getProperty">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="key">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="arguments">
+          <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="getProperty">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="propertiesFileName">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="key">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="getProperty">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="propertiesFileName">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="key">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+        <eParameters name="arguments">
+          <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="+">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        <eParameters name="other">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Collection(T)_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Collection(T)"/>
+      </eAnnotations>
+      <eOperations name="sep">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/acceleo/mtl/3.0/mtlnonstdlib.ecore#//Sequence(OclAny)"/>
+        <eParameters name="separatorString">
+          <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+        </eParameters>
+      </eOperations>
+      <eOperations name="filter">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:CollectionType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Collection(T)"/>
+        <eParameters name="filter">
+          <eType xsi:type="ocl.ecore:TypeType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OclType"/>
+        </eParameters>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Sequence(T)_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Sequence(T)"/>
+      </eAnnotations>
+      <eOperations name="reverse">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:SequenceType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Sequence(T)"/>
+      </eOperations>
+      <eOperations name="lastIndexOf">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        <eParameters name="element">
+          <eType xsi:type="ocl.ecore:AnyType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/T"/>
+        </eParameters>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="OrderedSet(T)_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OrderedSet(T)"/>
+      </eAnnotations>
+      <eOperations name="reverse">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:OrderedSetType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/OrderedSet(T)"/>
+      </eOperations>
+      <eOperations name="lastIndexOf">
+        <eAnnotations source="MTL non-standard"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/Integer"/>
+        <eParameters name="element">
+          <eType xsi:type="ocl.ecore:AnyType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/T"/>
+        </eParameters>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Model_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+      </eAnnotations>
+      <eOperations name="generate">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/generate"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Rule_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+      </eAnnotations>
+      <eOperations name="gRule">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/gRule"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Specific_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+      </eAnnotations>
+      <eOperations name="specRule">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/specRule"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Domain_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+      </eAnnotations>
+      <eOperations name="domRule">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/domRule"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UIElement_Class">
+      <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+        <references href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+      </eAnnotations>
+      <eOperations name="cOutPattern">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/cOutPattern"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="domOutPattern">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/domOutPattern"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="nameString">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/nameString"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+      <eOperations name="cBindings">
+        <eAnnotations source="http://www.eclipse.org/ocl/1.1.0/OCL">
+          <contents xsi:type="ocl.ecore:Constraint"/>
+        </eAnnotations>
+        <eAnnotations source="MTL" references="/0/cBindings"/>
+        <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+      </eOperations>
+    </eClassifiers>
+  </ecore:EPackage>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ecore:EPackage name="collections">
+    <eClassifiers xsi:type="ocl.ecore:OrderedSetType" name="OrderedSet(Rule)" instanceClassName="java.util.LinkedHashSet">
+      <elementType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:OrderedSetType" name="OrderedSet(Specific)" instanceClassName="java.util.LinkedHashSet">
+      <elementType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:OrderedSetType" name="OrderedSet(Domain)" instanceClassName="java.util.LinkedHashSet">
+      <elementType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:OrderedSetType" name="OrderedSet(UIElement)" instanceClassName="java.util.LinkedHashSet">
+      <elementType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+    </eClassifiers>
+  </ecore:EPackage>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Model"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Rule"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Specific"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Domain"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ecore:EPackage name="types">
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="Button">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Button"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="Window">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Window"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="Panel">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//Panel"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="ListElementSelector">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//ListElementSelector"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="DataField">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//DataField"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="ImageField">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//ImageField"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="TextArea">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//TextArea"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ocl.ecore:TypeType" name="TextField">
+      <referredType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//TextField"/>
+    </eClassifiers>
+  </ecore:EPackage>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ocl.ecore:PrimitiveType" href="http://www.eclipse.org/ocl/1.1.0/oclstdlib.ecore#/0/String"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.lu.tudor/modeling/transformation/TauHCI#//UIElement"/>
+  </ocl.ecore:Variable>
+  <ocl.ecore:Variable name="self">
+    <eType xsi:type="ecore:EClass" href="http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
+  </ocl.ecore:Variable>
+  <ecore:EAnnotation source="positions">
+    <eAnnotations source="positions.0" references="/0/generate">
+      <details key="start" value="147"/>
+      <details key="end" value="3831"/>
+      <details key="line" value="4"/>
+    </eAnnotations>
+    <eAnnotations source="positions.1" references="/0/generate/@body.0">
+      <details key="start" value="190"/>
+      <details key="end" value="192"/>
+      <details key="line" value="5"/>
+    </eAnnotations>
+    <eAnnotations source="positions.2" references="/0/generate/@body.1">
+      <details key="start" value="212"/>
+      <details key="end" value="3817"/>
+      <details key="line" value="7"/>
+    </eAnnotations>
+    <eAnnotations source="positions.3" references="/0/generate/@body.1/@body.0">
+      <details key="start" value="264"/>
+      <details key="end" value="720"/>
+      <details key="line" value="8"/>
+    </eAnnotations>
+    <eAnnotations source="positions.4" references="/0/generate/@body.1/@body.1">
+      <details key="start" value="790"/>
+      <details key="end" value="2479"/>
+      <details key="line" value="19"/>
+    </eAnnotations>
+    <eAnnotations source="positions.5" references="/0/generate/@body.1/@body.2">
+      <details key="start" value="2513"/>
+      <details key="end" value="2639"/>
+      <details key="line" value="57"/>
+    </eAnnotations>
+    <eAnnotations source="positions.6" references="/0/generate/@body.1/@body.3">
+      <details key="start" value="2695"/>
+      <details key="end" value="3148"/>
+      <details key="line" value="67"/>
+    </eAnnotations>
+    <eAnnotations source="positions.7" references="/0/generate/@body.1/@body.4">
+      <details key="start" value="3198"/>
+      <details key="end" value="3332"/>
+      <details key="line" value="80"/>
+    </eAnnotations>
+    <eAnnotations source="positions.8" references="/0/generate/@body.1/@body.5">
+      <details key="start" value="3332"/>
+      <details key="end" value="3385"/>
+      <details key="line" value="83"/>
+    </eAnnotations>
+    <eAnnotations source="positions.9" references="/0/generate/@body.1/@body.5/@body.0">
+      <details key="start" value="3366"/>
+      <details key="end" value="3376"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.10" references="/0/generate/@body.1/@body.5/@body.0/it">
+      <details key="start" value="3366"/>
+      <details key="end" value="3368"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.11" references="/0/generate/@body.1/@body.5/@body.1">
+      <details key="start" value="3378"/>
+      <details key="end" value="3379"/>
+      <details key="line" value="85"/>
+    </eAnnotations>
+    <eAnnotations source="positions.12" references="/0/generate/@body.1/@body.5/it">
+      <details key="start" value="3338"/>
+      <details key="end" value="3347"/>
+      <details key="line" value="83"/>
+    </eAnnotations>
+    <eAnnotations source="positions.13" references="/0/generate/@body.1/@body.5/@iterSet">
+      <details key="start" value="3350"/>
+      <details key="end" value="3362"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.14" references="/0/generate/@body.1/@body.5/@iterSet/aModel">
+      <details key="start" value="3350"/>
+      <details key="end" value="3356"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.15" references="/0/generate/@body.1/@body.6">
+      <details key="start" value="3386"/>
+      <details key="end" value="3522"/>
+      <details key="line" value="86"/>
+    </eAnnotations>
+    <eAnnotations source="positions.16" references="/0/generate/@body.1/@body.7">
+      <details key="start" value="3522"/>
+      <details key="end" value="3590"/>
+      <details key="line" value="90"/>
+    </eAnnotations>
+    <eAnnotations source="positions.17" references="/0/generate/@body.1/@body.7/@body.0">
+      <details key="start" value="3568"/>
+      <details key="end" value="3581"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.18" references="/0/generate/@body.1/@body.7/@body.0/it">
+      <details key="start" value="3568"/>
+      <details key="end" value="3570"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.19" references="/0/generate/@body.1/@body.7/@body.1">
+      <details key="start" value="3583"/>
+      <details key="end" value="3584"/>
+      <details key="line" value="92"/>
+    </eAnnotations>
+    <eAnnotations source="positions.20" references="/0/generate/@body.1/@body.7/it">
+      <details key="start" value="3528"/>
+      <details key="end" value="3541"/>
+      <details key="line" value="90"/>
+    </eAnnotations>
+    <eAnnotations source="positions.21" references="/0/generate/@body.1/@body.7/@iterSet">
+      <details key="start" value="3544"/>
+      <details key="end" value="3564"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.22" references="/0/generate/@body.1/@body.7/@iterSet/aModel">
+      <details key="start" value="3544"/>
+      <details key="end" value="3550"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.23" references="/0/generate/@body.1/@body.8">
+      <details key="start" value="3591"/>
+      <details key="end" value="3743"/>
+      <details key="line" value="93"/>
+    </eAnnotations>
+    <eAnnotations source="positions.24" references="/0/generate/@body.1/@body.9">
+      <details key="start" value="3743"/>
+      <details key="end" value="3807"/>
+      <details key="line" value="97"/>
+    </eAnnotations>
+    <eAnnotations source="positions.25" references="/0/generate/@body.1/@body.9/@body.0">
+      <details key="start" value="3784"/>
+      <details key="end" value="3785"/>
+      <details key="line" value="98"/>
+    </eAnnotations>
+    <eAnnotations source="positions.26" references="/0/generate/@body.1/@body.9/@body.1">
+      <details key="start" value="3786"/>
+      <details key="end" value="3798"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.27" references="/0/generate/@body.1/@body.9/@body.1/it">
+      <details key="start" value="3786"/>
+      <details key="end" value="3788"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.28" references="/0/generate/@body.1/@body.9/@body.2">
+      <details key="start" value="3800"/>
+      <details key="end" value="3801"/>
+      <details key="line" value="99"/>
+    </eAnnotations>
+    <eAnnotations source="positions.29" references="/0/generate/@body.1/@body.9/it">
+      <details key="start" value="3749"/>
+      <details key="end" value="3760"/>
+      <details key="line" value="97"/>
+    </eAnnotations>
+    <eAnnotations source="positions.30" references="/0/generate/@body.1/@body.9/@iterSet">
+      <details key="start" value="3763"/>
+      <details key="end" value="3781"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.31" references="/0/generate/@body.1/@body.9/@iterSet/aModel">
+      <details key="start" value="3763"/>
+      <details key="end" value="3769"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.32" references="/0/generate/@body.1/@body.10">
+      <details key="start" value="3808"/>
+      <details key="end" value="3809"/>
+      <details key="line" value="100"/>
+    </eAnnotations>
+    <eAnnotations source="positions.33" references="/0/generate/@body.1/@fileUrl">
+      <details key="start" value="219"/>
+      <details key="end" value="245"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.34" references="/0/generate/@body.1/@fileUrl/@source">
+      <details key="start" value="219"/>
+      <details key="end" value="230"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.35" references="/0/generate/@body.1/@fileUrl/@argument.0">
+      <details key="start" value="238"/>
+      <details key="end" value="244"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.36" references="/0/generate/@body.1/@charset">
+      <details key="start" value="254"/>
+      <details key="end" value="261"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.37" references="/0/generate/@body.2">
+      <details key="start" value="3818"/>
+      <details key="end" value="3819"/>
+      <details key="line" value="102"/>
+    </eAnnotations>
+    <eAnnotations source="positions.38" references="/0/generate/aModel">
+      <details key="start" value="173"/>
+      <details key="end" value="187"/>
+      <details key="line" value="4"/>
+    </eAnnotations>
+    <eAnnotations source="positions.39" references="/0/gRule">
+      <details key="start" value="3833"/>
+      <details key="end" value="4620"/>
+      <details key="line" value="105"/>
+    </eAnnotations>
+    <eAnnotations source="positions.40" references="/0/gRule/@body.0">
+      <details key="start" value="3871"/>
+      <details key="end" value="3877"/>
+      <details key="line" value="106"/>
+    </eAnnotations>
+    <eAnnotations source="positions.41" references="/0/gRule/@body.1">
+      <details key="start" value="3878"/>
+      <details key="end" value="3938"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.42" references="/0/gRule/@body.1/@source">
+      <details key="start" value="3878"/>
+      <details key="end" value="3903"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.43" references="/0/gRule/@body.1/@source/@source">
+      <details key="start" value="3878"/>
+      <details key="end" value="3890"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.44" references="/0/gRule/@body.1/@source/@source/rule">
+      <details key="start" value="3878"/>
+      <details key="end" value="3882"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.45" references="/0/gRule/@body.1/@source/@argument.0">
+      <details key="start" value="3898"/>
+      <details key="end" value="3902"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.46" references="/0/gRule/@body.1/@argument.0">
+      <details key="start" value="3911"/>
+      <details key="end" value="3937"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.47" references="/0/gRule/@body.1/@argument.0/@argument.0">
+      <details key="start" value="3922"/>
+      <details key="end" value="3936"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.48" references="/0/gRule/@body.1/@argument.0/@argument.0/rule">
+      <details key="start" value="3922"/>
+      <details key="end" value="3926"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.49" references="/0/gRule/@body.2">
+      <details key="start" value="3940"/>
+      <details key="end" value="3975"/>
+      <details key="line" value="106"/>
+    </eAnnotations>
+    <eAnnotations source="positions.50" references="/0/gRule/@body.3">
+      <details key="start" value="3975"/>
+      <details key="end" value="4503"/>
+      <details key="line" value="109"/>
+    </eAnnotations>
+    <eAnnotations source="positions.51" references="/0/gRule/@body.3/@body.0">
+      <details key="start" value="4020"/>
+      <details key="end" value="4067"/>
+      <details key="line" value="110"/>
+    </eAnnotations>
+    <eAnnotations source="positions.52" references="/0/gRule/@body.3/@ifExpr">
+      <details key="start" value="3979"/>
+      <details key="end" value="4018"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.53" references="/0/gRule/@body.3/@ifExpr/@source">
+      <details key="start" value="3980"/>
+      <details key="end" value="3992"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.54" references="/0/gRule/@body.3/@ifExpr/@source/rule">
+      <details key="start" value="3980"/>
+      <details key="end" value="3984"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.55" references="/0/gRule/@body.3/@ifExpr/@argument.0">
+      <details key="start" value="4010"/>
+      <details key="end" value="4016"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.56" references="/0/gRule/@body.3/@else">
+      <details key="start" value="4067"/>
+      <details key="end" value="4498"/>
+      <details key="line" value="110"/>
+    </eAnnotations>
+    <eAnnotations source="positions.57" references="/0/gRule/@body.3/@else/@body.0">
+      <details key="start" value="4075"/>
+      <details key="end" value="4094"/>
+      <details key="line" value="110"/>
+    </eAnnotations>
+    <eAnnotations source="positions.58" references="/0/gRule/@body.3/@else/@body.1">
+      <details key="start" value="4095"/>
+      <details key="end" value="4107"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.59" references="/0/gRule/@body.3/@else/@body.1/rule">
+      <details key="start" value="4095"/>
+      <details key="end" value="4099"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.60" references="/0/gRule/@body.3/@else/@body.2">
+      <details key="start" value="4109"/>
+      <details key="end" value="4111"/>
+      <details key="line" value="111"/>
+    </eAnnotations>
+    <eAnnotations source="positions.61" references="/0/gRule/@body.3/@else/@body.3">
+      <details key="start" value="4117"/>
+      <details key="end" value="4227"/>
+      <details key="line" value="112"/>
+    </eAnnotations>
+    <eAnnotations source="positions.62" references="/0/gRule/@body.3/@else/@body.3/@body.0">
+      <details key="start" value="4180"/>
+      <details key="end" value="4216"/>
+      <details key="line" value="113"/>
+    </eAnnotations>
+    <eAnnotations source="positions.63" references="/0/gRule/@body.3/@else/@body.3/@ifExpr">
+      <details key="start" value="4121"/>
+      <details key="end" value="4178"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.64" references="/0/gRule/@body.3/@else/@body.3/@ifExpr/@source">
+      <details key="start" value="4122"/>
+      <details key="end" value="4145"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.65" references="/0/gRule/@body.3/@else/@body.3/@ifExpr/@source/rule">
+      <details key="start" value="4122"/>
+      <details key="end" value="4126"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.66" references="/0/gRule/@body.3/@else/@body.3/@ifExpr/@argument.0">
+      <details key="start" value="4163"/>
+      <details key="end" value="4176"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.67" references="/0/gRule/@body.3/@else/@body.4">
+      <details key="start" value="4235"/>
+      <details key="end" value="4491"/>
+      <details key="line" value="115"/>
+    </eAnnotations>
+    <eAnnotations source="positions.68" references="/0/gRule/@body.3/@else/@body.4/@body.0">
+      <details key="start" value="4301"/>
+      <details key="end" value="4331"/>
+      <details key="line" value="116"/>
+    </eAnnotations>
+    <eAnnotations source="positions.69" references="/0/gRule/@body.3/@else/@body.4/@body.1">
+      <details key="start" value="4390"/>
+      <details key="end" value="4422"/>
+      <details key="line" value="117"/>
+    </eAnnotations>
+    <eAnnotations source="positions.70" references="/0/gRule/@body.3/@else/@body.4/@body.2">
+      <details key="start" value="4479"/>
+      <details key="end" value="4480"/>
+      <details key="line" value="118"/>
+    </eAnnotations>
+    <eAnnotations source="positions.71" references="/0/gRule/@body.3/@else/@body.4/@ifExpr">
+      <details key="start" value="4239"/>
+      <details key="end" value="4299"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.72" references="/0/gRule/@body.3/@else/@body.4/@ifExpr/@source">
+      <details key="start" value="4240"/>
+      <details key="end" value="4263"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.73" references="/0/gRule/@body.3/@else/@body.4/@ifExpr/@source/rule">
+      <details key="start" value="4240"/>
+      <details key="end" value="4244"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.74" references="/0/gRule/@body.3/@else/@body.4/@ifExpr/@argument.0">
+      <details key="start" value="4281"/>
+      <details key="end" value="4297"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.75" references="/0/gRule/@body.4">
+      <details key="start" value="4504"/>
+      <details key="end" value="4521"/>
+      <details key="line" value="120"/>
+    </eAnnotations>
+    <eAnnotations source="positions.76" references="/0/gRule/@body.5">
+      <details key="start" value="4522"/>
+      <details key="end" value="4550"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.77" references="/0/gRule/@body.5/@argument.0">
+      <details key="start" value="4522"/>
+      <details key="end" value="4536"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.78" references="/0/gRule/@body.5/@argument.0/rule">
+      <details key="start" value="4522"/>
+      <details key="end" value="4526"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.79" references="/0/gRule/@body.6">
+      <details key="start" value="4552"/>
+      <details key="end" value="4557"/>
+      <details key="line" value="122"/>
+    </eAnnotations>
+    <eAnnotations source="positions.80" references="/0/gRule/@body.7">
+      <details key="start" value="4606"/>
+      <details key="end" value="4608"/>
+      <details key="line" value="123"/>
+    </eAnnotations>
+    <eAnnotations source="positions.81" references="/0/gRule/rule">
+      <details key="start" value="3857"/>
+      <details key="end" value="3868"/>
+      <details key="line" value="105"/>
+    </eAnnotations>
+    <eAnnotations source="positions.82" references="/0/specRule">
+      <details key="start" value="4622"/>
+      <details key="end" value="5025"/>
+      <details key="line" value="127"/>
+    </eAnnotations>
+    <eAnnotations source="positions.83" references="/0/specRule/@body.0">
+      <details key="start" value="4736"/>
+      <details key="end" value="4759"/>
+      <details key="line" value="129"/>
+    </eAnnotations>
+    <eAnnotations source="positions.84" references="/0/specRule/@body.1">
+      <details key="start" value="4760"/>
+      <details key="end" value="4852"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.85" references="/0/specRule/@body.1/@source">
+      <details key="start" value="4760"/>
+      <details key="end" value="4807"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.86" references="/0/specRule/@body.1/@source/@source">
+      <details key="start" value="4760"/>
+      <details key="end" value="4794"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.87" references="/0/specRule/@body.1/@source/@source/@source">
+      <details key="start" value="4760"/>
+      <details key="end" value="4774"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.88" references="/0/specRule/@body.1/@source/@source/@source/srule">
+      <details key="start" value="4760"/>
+      <details key="end" value="4765"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.89" references="/0/specRule/@body.1/@source/@source/@argument.0">
+      <details key="start" value="4786"/>
+      <details key="end" value="4789"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.90" references="/0/specRule/@body.1/@source/@source/@argument.1">
+      <details key="start" value="4791"/>
+      <details key="end" value="4793"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.91" references="/0/specRule/@body.1/@source/@argument.0">
+      <details key="start" value="4802"/>
+      <details key="end" value="4806"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.92" references="/0/specRule/@body.1/@argument.0">
+      <details key="start" value="4815"/>
+      <details key="end" value="4851"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.93" references="/0/specRule/@body.1/@argument.0/@argument.0">
+      <details key="start" value="4826"/>
+      <details key="end" value="4850"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.94" references="/0/specRule/@body.1/@argument.0/@argument.0/@source">
+      <details key="start" value="4826"/>
+      <details key="end" value="4841"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.95" references="/0/specRule/@body.1/@argument.0/@argument.0/@source/srule">
+      <details key="start" value="4826"/>
+      <details key="end" value="4831"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.96" references="/0/specRule/@body.2">
+      <details key="start" value="4855"/>
+      <details key="end" value="4897"/>
+      <details key="line" value="129"/>
+    </eAnnotations>
+    <eAnnotations source="positions.97" references="/0/specRule/@body.3">
+      <details key="start" value="4898"/>
+      <details key="end" value="4912"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.98" references="/0/specRule/@body.3/srule">
+      <details key="start" value="4898"/>
+      <details key="end" value="4903"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.99" references="/0/specRule/@body.4">
+      <details key="start" value="4914"/>
+      <details key="end" value="4923"/>
+      <details key="line" value="131"/>
+    </eAnnotations>
+    <eAnnotations source="positions.100" references="/0/specRule/@body.5">
+      <details key="start" value="4924"/>
+      <details key="end" value="4962"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.101" references="/0/specRule/@body.5/@argument.0">
+      <details key="start" value="4924"/>
+      <details key="end" value="4948"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.102" references="/0/specRule/@body.5/@argument.0/@source">
+      <details key="start" value="4924"/>
+      <details key="end" value="4939"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.103" references="/0/specRule/@body.5/@argument.0/@source/srule">
+      <details key="start" value="4924"/>
+      <details key="end" value="4929"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.104" references="/0/specRule/@body.6">
+      <details key="start" value="4964"/>
+      <details key="end" value="4965"/>
+      <details key="line" value="134"/>
+    </eAnnotations>
+    <eAnnotations source="positions.105" references="/0/specRule/@body.7">
+      <details key="start" value="5011"/>
+      <details key="end" value="5013"/>
+      <details key="line" value="134"/>
+    </eAnnotations>
+    <eAnnotations source="positions.106" references="/0/specRule/srule">
+      <details key="start" value="4649"/>
+      <details key="end" value="4665"/>
+      <details key="line" value="127"/>
+    </eAnnotations>
+    <eAnnotations source="positions.107" references="/0/domRule">
+      <details key="start" value="5028"/>
+      <details key="end" value="5257"/>
+      <details key="line" value="139"/>
+    </eAnnotations>
+    <eAnnotations source="positions.108" references="/0/domRule/@body.0">
+      <details key="start" value="5072"/>
+      <details key="end" value="5089"/>
+      <details key="line" value="140"/>
+    </eAnnotations>
+    <eAnnotations source="positions.109" references="/0/domRule/@body.1">
+      <details key="start" value="5090"/>
+      <details key="end" value="5157"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.110" references="/0/domRule/@body.1/@source">
+      <details key="start" value="5090"/>
+      <details key="end" value="5120"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.111" references="/0/domRule/@body.1/@source/@source">
+      <details key="start" value="5090"/>
+      <details key="end" value="5107"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.112" references="/0/domRule/@body.1/@source/@source/domain">
+      <details key="start" value="5090"/>
+      <details key="end" value="5096"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.113" references="/0/domRule/@body.1/@source/@argument.0">
+      <details key="start" value="5115"/>
+      <details key="end" value="5119"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.114" references="/0/domRule/@body.1/@argument.0">
+      <details key="start" value="5128"/>
+      <details key="end" value="5156"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.115" references="/0/domRule/@body.1/@argument.0/@argument.0">
+      <details key="start" value="5139"/>
+      <details key="end" value="5155"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.116" references="/0/domRule/@body.1/@argument.0/@argument.0/domain">
+      <details key="start" value="5139"/>
+      <details key="end" value="5145"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.117" references="/0/domRule/@body.2">
+      <details key="start" value="5159"/>
+      <details key="end" value="5205"/>
+      <details key="line" value="140"/>
+    </eAnnotations>
+    <eAnnotations source="positions.118" references="/0/domRule/@body.3">
+      <details key="start" value="5206"/>
+      <details key="end" value="5238"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.119" references="/0/domRule/@body.3/@argument.0">
+      <details key="start" value="5206"/>
+      <details key="end" value="5222"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.120" references="/0/domRule/@body.3/@argument.0/domain">
+      <details key="start" value="5206"/>
+      <details key="end" value="5212"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.121" references="/0/domRule/@body.4">
+      <details key="start" value="5241"/>
+      <details key="end" value="5245"/>
+      <details key="line" value="145"/>
+    </eAnnotations>
+    <eAnnotations source="positions.122" references="/0/domRule/domain">
+      <details key="start" value="5054"/>
+      <details key="end" value="5069"/>
+      <details key="line" value="139"/>
+    </eAnnotations>
+    <eAnnotations source="positions.123" references="/0/cOutPattern">
+      <details key="start" value="5259"/>
+      <details key="end" value="5421"/>
+      <details key="line" value="149"/>
+    </eAnnotations>
+    <eAnnotations source="positions.124" references="/0/cOutPattern/@body.0">
+      <details key="start" value="5307"/>
+      <details key="end" value="5319"/>
+      <details key="line" value="150"/>
+    </eAnnotations>
+    <eAnnotations source="positions.125" references="/0/cOutPattern/@body.1">
+      <details key="start" value="5320"/>
+      <details key="end" value="5336"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.126" references="/0/cOutPattern/@body.1/elem">
+      <details key="start" value="5331"/>
+      <details key="end" value="5335"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.127" references="/0/cOutPattern/@body.2">
+      <details key="start" value="5338"/>
+      <details key="end" value="5389"/>
+      <details key="line" value="150"/>
+    </eAnnotations>
+    <eAnnotations source="positions.128" references="/0/cOutPattern/@body.3">
+      <details key="start" value="5390"/>
+      <details key="end" value="5405"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.129" references="/0/cOutPattern/@body.3/elem">
+      <details key="start" value="5400"/>
+      <details key="end" value="5404"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.130" references="/0/cOutPattern/@body.4">
+      <details key="start" value="5407"/>
+      <details key="end" value="5409"/>
+      <details key="line" value="153"/>
+    </eAnnotations>
+    <eAnnotations source="positions.131" references="/0/cOutPattern/elem">
+      <details key="start" value="5289"/>
+      <details key="end" value="5304"/>
+      <details key="line" value="149"/>
+    </eAnnotations>
+    <eAnnotations source="positions.132" references="/0/domOutPattern">
+      <details key="start" value="5423"/>
+      <details key="end" value="5619"/>
+      <details key="line" value="156"/>
+    </eAnnotations>
+    <eAnnotations source="positions.133" references="/0/domOutPattern/@body.0">
+      <details key="start" value="5473"/>
+      <details key="end" value="5484"/>
+      <details key="line" value="157"/>
+    </eAnnotations>
+    <eAnnotations source="positions.134" references="/0/domOutPattern/@body.1">
+      <details key="start" value="5485"/>
+      <details key="end" value="5501"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.135" references="/0/domOutPattern/@body.1/elem">
+      <details key="start" value="5496"/>
+      <details key="end" value="5500"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.136" references="/0/domOutPattern/@body.2">
+      <details key="start" value="5503"/>
+      <details key="end" value="5607"/>
+      <details key="line" value="157"/>
+    </eAnnotations>
+    <eAnnotations source="positions.137" references="/0/domOutPattern/elem">
+      <details key="start" value="5455"/>
+      <details key="end" value="5470"/>
+      <details key="line" value="156"/>
+    </eAnnotations>
+    <eAnnotations source="positions.138" references="/0/nameString">
+      <details key="start" value="5622"/>
+      <details key="end" value="6198"/>
+      <details key="line" value="164"/>
+    </eAnnotations>
+    <eAnnotations source="positions.139" references="/0/nameString/@body.0">
+      <details key="start" value="5729"/>
+      <details key="end" value="5776"/>
+      <details key="line" value="166"/>
+    </eAnnotations>
+    <eAnnotations source="positions.140" references="/0/nameString/@body.0/@body.0">
+      <details key="start" value="5761"/>
+      <details key="end" value="5769"/>
+      <details key="line" value="167"/>
+    </eAnnotations>
+    <eAnnotations source="positions.141" references="/0/nameString/@body.0/@ifExpr">
+      <details key="start" value="5733"/>
+      <details key="end" value="5759"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.142" references="/0/nameString/@body.0/@ifExpr/elem">
+      <details key="start" value="5734"/>
+      <details key="end" value="5738"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.143" references="/0/nameString/@body.0/@ifExpr/@argument.0">
+      <details key="start" value="5751"/>
+      <details key="end" value="5757"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.144" references="/0/nameString/@body.1">
+      <details key="start" value="5780"/>
+      <details key="end" value="5829"/>
+      <details key="line" value="169"/>
+    </eAnnotations>
+    <eAnnotations source="positions.145" references="/0/nameString/@body.1/@body.0">
+      <details key="start" value="5812"/>
+      <details key="end" value="5821"/>
+      <details key="line" value="170"/>
+    </eAnnotations>
+    <eAnnotations source="positions.146" references="/0/nameString/@body.1/@ifExpr">
+      <details key="start" value="5784"/>
+      <details key="end" value="5810"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.147" references="/0/nameString/@body.1/@ifExpr/elem">
+      <details key="start" value="5785"/>
+      <details key="end" value="5789"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.148" references="/0/nameString/@body.1/@ifExpr/@argument.0">
+      <details key="start" value="5802"/>
+      <details key="end" value="5808"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.149" references="/0/nameString/@body.2">
+      <details key="start" value="5833"/>
+      <details key="end" value="5879"/>
+      <details key="line" value="172"/>
+    </eAnnotations>
+    <eAnnotations source="positions.150" references="/0/nameString/@body.2/@body.0">
+      <details key="start" value="5864"/>
+      <details key="end" value="5871"/>
+      <details key="line" value="173"/>
+    </eAnnotations>
+    <eAnnotations source="positions.151" references="/0/nameString/@body.2/@ifExpr">
+      <details key="start" value="5837"/>
+      <details key="end" value="5862"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.152" references="/0/nameString/@body.2/@ifExpr/elem">
+      <details key="start" value="5838"/>
+      <details key="end" value="5842"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.153" references="/0/nameString/@body.2/@ifExpr/@argument.0">
+      <details key="start" value="5855"/>
+      <details key="end" value="5860"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.154" references="/0/nameString/@body.3">
+      <details key="start" value="5889"/>
+      <details key="end" value="5963"/>
+      <details key="line" value="175"/>
+    </eAnnotations>
+    <eAnnotations source="positions.155" references="/0/nameString/@body.3/@body.0">
+      <details key="start" value="5934"/>
+      <details key="end" value="5955"/>
+      <details key="line" value="176"/>
+    </eAnnotations>
+    <eAnnotations source="positions.156" references="/0/nameString/@body.3/@ifExpr">
+      <details key="start" value="5893"/>
+      <details key="end" value="5932"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.157" references="/0/nameString/@body.3/@ifExpr/elem">
+      <details key="start" value="5894"/>
+      <details key="end" value="5898"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.158" references="/0/nameString/@body.3/@ifExpr/@argument.0">
+      <details key="start" value="5911"/>
+      <details key="end" value="5930"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.159" references="/0/nameString/@body.4">
+      <details key="start" value="5967"/>
+      <details key="end" value="6021"/>
+      <details key="line" value="178"/>
+    </eAnnotations>
+    <eAnnotations source="positions.160" references="/0/nameString/@body.4/@body.0">
+      <details key="start" value="6002"/>
+      <details key="end" value="6013"/>
+      <details key="line" value="179"/>
+    </eAnnotations>
+    <eAnnotations source="positions.161" references="/0/nameString/@body.4/@ifExpr">
+      <details key="start" value="5971"/>
+      <details key="end" value="6000"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.162" references="/0/nameString/@body.4/@ifExpr/elem">
+      <details key="start" value="5972"/>
+      <details key="end" value="5976"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.163" references="/0/nameString/@body.4/@ifExpr/@argument.0">
+      <details key="start" value="5989"/>
+      <details key="end" value="5998"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.164" references="/0/nameString/@body.5">
+      <details key="start" value="6024"/>
+      <details key="end" value="6078"/>
+      <details key="line" value="181"/>
+    </eAnnotations>
+    <eAnnotations source="positions.165" references="/0/nameString/@body.5/@body.0">
+      <details key="start" value="6060"/>
+      <details key="end" value="6071"/>
+      <details key="line" value="182"/>
+    </eAnnotations>
+    <eAnnotations source="positions.166" references="/0/nameString/@body.5/@ifExpr">
+      <details key="start" value="6028"/>
+      <details key="end" value="6058"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.167" references="/0/nameString/@body.5/@ifExpr/elem">
+      <details key="start" value="6029"/>
+      <details key="end" value="6033"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.168" references="/0/nameString/@body.5/@ifExpr/@argument.0">
+      <details key="start" value="6046"/>
+      <details key="end" value="6056"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.169" references="/0/nameString/@body.6">
+      <details key="start" value="6081"/>
+      <details key="end" value="6131"/>
+      <details key="line" value="184"/>
+    </eAnnotations>
+    <eAnnotations source="positions.170" references="/0/nameString/@body.6/@body.0">
+      <details key="start" value="6115"/>
+      <details key="end" value="6124"/>
+      <details key="line" value="185"/>
+    </eAnnotations>
+    <eAnnotations source="positions.171" references="/0/nameString/@body.6/@ifExpr">
+      <details key="start" value="6085"/>
+      <details key="end" value="6113"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.172" references="/0/nameString/@body.6/@ifExpr/elem">
+      <details key="start" value="6086"/>
+      <details key="end" value="6090"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.173" references="/0/nameString/@body.6/@ifExpr/@argument.0">
+      <details key="start" value="6103"/>
+      <details key="end" value="6111"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.174" references="/0/nameString/@body.7">
+      <details key="start" value="6134"/>
+      <details key="end" value="6186"/>
+      <details key="line" value="187"/>
+    </eAnnotations>
+    <eAnnotations source="positions.175" references="/0/nameString/@body.7/@body.0">
+      <details key="start" value="6169"/>
+      <details key="end" value="6179"/>
+      <details key="line" value="188"/>
+    </eAnnotations>
+    <eAnnotations source="positions.176" references="/0/nameString/@body.7/@ifExpr">
+      <details key="start" value="6138"/>
+      <details key="end" value="6167"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.177" references="/0/nameString/@body.7/@ifExpr/elem">
+      <details key="start" value="6139"/>
+      <details key="end" value="6143"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.178" references="/0/nameString/@body.7/@ifExpr/@argument.0">
+      <details key="start" value="6156"/>
+      <details key="end" value="6165"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.179" references="/0/nameString/elem">
+      <details key="start" value="5651"/>
+      <details key="end" value="5666"/>
+      <details key="line" value="164"/>
+    </eAnnotations>
+    <eAnnotations source="positions.180" references="/0/cBindings">
+      <details key="start" value="6201"/>
+      <details key="end" value="6940"/>
+      <details key="line" value="193"/>
+    </eAnnotations>
+    <eAnnotations source="positions.181" references="/0/cBindings/@body.0">
+      <details key="start" value="6250"/>
+      <details key="end" value="6455"/>
+      <details key="line" value="194"/>
+    </eAnnotations>
+    <eAnnotations source="positions.182" references="/0/cBindings/@body.0/@body.0">
+      <details key="start" value="6282"/>
+      <details key="end" value="6447"/>
+      <details key="line" value="195"/>
+    </eAnnotations>
+    <eAnnotations source="positions.183" references="/0/cBindings/@body.0/@ifExpr">
+      <details key="start" value="6254"/>
+      <details key="end" value="6280"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.184" references="/0/cBindings/@body.0/@ifExpr/elem">
+      <details key="start" value="6255"/>
+      <details key="end" value="6259"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.185" references="/0/cBindings/@body.0/@ifExpr/@argument.0">
+      <details key="start" value="6272"/>
+      <details key="end" value="6278"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.186" references="/0/cBindings/@body.1">
+      <details key="start" value="6459"/>
+      <details key="end" value="6746"/>
+      <details key="line" value="199"/>
+    </eAnnotations>
+    <eAnnotations source="positions.187" references="/0/cBindings/@body.1/@body.0">
+      <details key="start" value="6490"/>
+      <details key="end" value="6538"/>
+      <details key="line" value="200"/>
+    </eAnnotations>
+    <eAnnotations source="positions.188" references="/0/cBindings/@body.1/@body.1">
+      <details key="start" value="6621"/>
+      <details key="end" value="6738"/>
+      <details key="line" value="203"/>
+    </eAnnotations>
+    <eAnnotations source="positions.189" references="/0/cBindings/@body.1/@ifExpr">
+      <details key="start" value="6463"/>
+      <details key="end" value="6488"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.190" references="/0/cBindings/@body.1/@ifExpr/elem">
+      <details key="start" value="6464"/>
+      <details key="end" value="6468"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.191" references="/0/cBindings/@body.1/@ifExpr/@argument.0">
+      <details key="start" value="6481"/>
+      <details key="end" value="6486"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.192" references="/0/cBindings/@body.2">
+      <details key="start" value="6756"/>
+      <details key="end" value="6928"/>
+      <details key="line" value="205"/>
+    </eAnnotations>
+    <eAnnotations source="positions.193" references="/0/cBindings/@body.2/@body.0">
+      <details key="start" value="6801"/>
+      <details key="end" value="6920"/>
+      <details key="line" value="206"/>
+    </eAnnotations>
+    <eAnnotations source="positions.194" references="/0/cBindings/@body.2/@ifExpr">
+      <details key="start" value="6760"/>
+      <details key="end" value="6799"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.195" references="/0/cBindings/@body.2/@ifExpr/elem">
+      <details key="start" value="6761"/>
+      <details key="end" value="6765"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.196" references="/0/cBindings/@body.2/@ifExpr/@argument.0">
+      <details key="start" value="6778"/>
+      <details key="end" value="6797"/>
+      <details key="line" value="0"/>
+    </eAnnotations>
+    <eAnnotations source="positions.197" references="/0/cBindings/elem">
+      <details key="start" value="6229"/>
+      <details key="end" value="6244"/>
+      <details key="line" value="193"/>
+    </eAnnotations>
+  </ecore:EAnnotation>
+</xmi:XMI>

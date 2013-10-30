@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/tudor.lu.modeling.transformation.tauHCI/src-gen"
+    editDirectory="/tudor.lu.modeling.transformation.tauHCI.edit/src" editorDirectory="/tudor.lu.modeling.transformation.tauHCI.editor/src"
+    modelPluginID="tudor.lu.modeling.transformation.tauHCI" forceOverwrite="true"
+    modelName="TauHCI" updateClasspath="false" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    complianceLevel="5.0" copyrightFields="false" editPluginID="tudor.lu.modeling.transformation.tauHCI.edit"
+    editorPluginID="tudor.lu.modeling.transformation.tauHCI.editor">
+  <genPackages prefix="TauHCI" basePackage="tudor.lu.modeling.transformation" disposableProviderFactory="true"
+      ecorePackage="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#/">
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Model">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Model/rules"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Model/specificRules"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Model/domainRules"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Rule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Rule/auitype"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Rule/taskType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Rule/interactivelyValid"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Rule/uielement"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Specific">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Specific/taskName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Specific/uielement"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Domain">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Domain/domainType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Domain/uielement"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//UIElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//UIElement/label"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Window">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Window/containedElements"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Panel">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Panel/containedElements"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//ListElementSelector">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//ListElementSelector/containedElements"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Concept">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Concept/selection"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//SelectedConcept">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//SelectedConcept/id"/>
+    </genClasses>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//Button"/>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//DataField"/>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//ImageField"/>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//TextField"/>
+    <genClasses ecoreClass="platform:/resource/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore#//TextArea"/>
+  </genPackages>
+</genmodel:GenModel>

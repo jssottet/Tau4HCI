@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ASCII"?>
+<tauHCI:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tauHCI="http://www.lu.tudor/modeling/transformation/TauHCI">
+  <rules auitype="container" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:Window"/>
+  </rules>
+  <rules auitype="container" taskType="abstract">
+    <uielement xsi:type="tauHCI:Panel"/>
+  </rules>
+  <rules auitype="output" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:Panel"/>
+  </rules>
+  <rules auitype="input" interactivelyValid="interactive"/>
+  <rules auitype="selection_1_n" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:ListElementSelector"/>
+  </rules>
+  <rules auitype="selection_n_n" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:ListElementSelector"/>
+  </rules>
+  <rules auitype="command" interactivelyValid="interactive"/>
+  <rules auitype="navigation" interactivelyValid="notinteractive"/>
+  <specificRules taskName="Fill the form"/>
+</tauHCI:Model>

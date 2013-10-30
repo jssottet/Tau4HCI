@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ASCII"?>
+<tauHCI:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tauHCI="http://www.lu.tudor/modeling/transformation/TauHCI">
+  <rules auitype="container" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:Window"/>
+  </rules>
+  <rules auitype="container" taskType="abstract">
+    <uielement xsi:type="tauHCI:Panel"/>
+  </rules>
+  <rules auitype="output" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:Panel"/>
+  </rules>
+  <rules auitype="input" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:DataField" label="&quot;label&quot;"/>
+  </rules>
+  <rules auitype="selection_1_n" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:ListElementSelector"/>
+  </rules>
+  <rules auitype="selection_n_n" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:ListElementSelector"/>
+  </rules>
+  <rules auitype="command" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:Button" label="&quot;test&quot;"/>
+  </rules>
+  <rules auitype="navigation" interactivelyValid="interactive">
+    <uielement xsi:type="tauHCI:Button" label="&quot;test&quot;"/>
+  </rules>
+  <specificRules taskName="Fill the form">
+    <uielement xsi:type="tauHCI:Button" label="&quot;rest&quot;"/>
+  </specificRules>
+  <domainRules domainType="string">
+    <uielement xsi:type="tauHCI:TextField" label="&quot;&quot;"/>
+  </domainRules>
+  <domainRules domainType="text">
+    <uielement xsi:type="tauHCI:TextArea" label="&quot;&quot;"/>
+  </domainRules>
+  <domainRules domainType="document">
+    <uielement xsi:type="tauHCI:ImageField" label="&quot;&quot;"/>
+  </domainRules>
+  <domainRules domainType="date">
+    <uielement xsi:type="tauHCI:DataField" label="&quot;&quot;"/>
+  </domainRules>
+</tauHCI:Model>

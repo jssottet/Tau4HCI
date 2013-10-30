@@ -1,0 +1,13 @@
+//rule from Root to "Space";
+//Standard pattern that covers the whole task type
+task rule from container interactive to Window with All Concepts;
+task rule from container and abstract to Panel with No Concepts;
+task rule from output interactive to Panel with All Concepts;
+task rule from input interactive to DataField;
+task rule from selection_1_n interactive to ListElementSelector with All Concepts;
+task rule from selection_n_n interactive to ListElementSelector with All Concepts;
+task rule from command interactive to Button;
+task rule from navigation notinteractive to Button;
+
+//Specific pattern that covers a specified task
+specific rule from "Fill the form" to Button; 
