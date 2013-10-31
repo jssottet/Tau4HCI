@@ -1,3 +1,4 @@
+[comment Copyright CRP Henri-Tudor 2012 - author Jean-Sébastien Sottet /*]
 [comment encoding = UTF-8 /]
 [module generate('/tudor.lu.modeling.transformation.tauHCI/src-gen/tudor/lu/modeling/transformation/TauHCI.ecore')/]
 
